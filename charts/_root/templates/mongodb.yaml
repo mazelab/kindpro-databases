@@ -1,0 +1,51 @@
+{{- if .Values.databases.mongodb -}}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: databases-mongodb
+  namespace: dafault
+  annotations:
+    mazelab.github.io/kindpro: "databases"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    namespace: kind-databases
+    server: https://kubernetes.default.svc
+  project: default
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
+    syncOptions:     # Sync options which modifies sync behavior
+      - Validate=true # disables resource validation (equivalent to 'kubectl apply --validate=false') ( true by default ).
+      - CreateNamespace=false # Namespace Auto-Creation ensures that namespace specified as the application destination exists in the destination cluster.
+      - PrunePropagationPolicy=foreground # Supported policies are background, foreground and orphan.
+      - PruneLast=true # Allow the ability for resource pruning to happen as a final, implicit wave of a sync operation
+    retry:
+      limit: 3 # number of failed sync attempt retries; unlimited number of attempts if less than 0
+      backoff:
+        duration: 5s # the amount to back off. Default unit is seconds, but could also be a duration (e.g. "2m", "1h")
+        factor: 2 # a factor to multiply the base duration after each failed retry
+        maxDuration: 3m # the maximum amount of time allowed for the backoff strategy
+  source:
+    repoURL: https://charts.bitnami.com/bitnami
+    targetRevision: 13.12.0
+    chart: mongodb
+    helm:
+      valuesObject:
+        fullnameOverride: mongodb
+        arbiter:
+          enabled: false
+        architecture: standalone
+        useStatefulSet: true
+        resources:
+          limits:
+            memory: 2Gi
+        auth:
+          trueexistingSecret: {{ $.Values.auth.trueexistingSecret }}
+        persistence:
+          size: 5Gi
+        rbac:
+          create: true
+{{- end -}}
