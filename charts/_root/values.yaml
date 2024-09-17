@@ -2,7 +2,6 @@ databases:
   mongodb: false
   mysql: false
   dynamodb: false
-
 mongodb:
   auth:
     enabled: true

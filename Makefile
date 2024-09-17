@@ -2,16 +2,30 @@ inital-deploy-root-app:
 	@helm template charts/_setup-root | kubectl apply -f -
 delete-root-app:
 	@helm template charts/_setup-root | kubectl delete -f -
-get-initial-argo-password:
-	kubectl get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
 
 get-mysql-password:
-	kubectl get secret mysql-auth -o jsonpath="{.data.mysql-root-password}" | base64 -d
+	kubectl get secret mysql-auth -o jsonpath="{.data.mysql-root-password}" -n kindpro-databases | base64 -d
+
+.PHONY: forward-mysql
+forward-mysql:
+	@kubectl port-forward svc/mysql 3306:3306 -n kindpro-databases &
 
 .PHONY: start-mysql
 start-mysql:
-	@helm template --set databases.mysql=true charts/_setup-root | kubectl apply -f -
+	@kubectl patch application root-databases -p '{"spec":{"source":{"helm":{"valuesObject":{"databases":{"mysql":true}}}}}}' --type=merge -n default
 
 .PHONY: stop-mysql
 stop-mysql:
-	@helm template --set databases.mysql=false charts/_setup-root | kubectl delete -f -
+	@kubectl patch application root-databases -p '{"spec":{"source":{"helm":{"valuesObject":{"databases":{"mysql":false}}}}}}' --type=merge -n default
+
+.PHONY: forward-mongodb
+forward-mongodb:
+	@kubectl port-forward svc/mongodb 27017:27017 -n kindpro-databases &
+
+.PHONY: start-mongodb
+start-mongodb:
+	@kubectl patch application root-databases -p '{"spec":{"source":{"helm":{"valuesObject":{"databases":{"mongodb":true}}}}}}' --type=merge -n default
+
+.PHONY: stop-mongodb
+stop-mongodb:
+	@kubectl patch application root-databases -p '{"spec":{"source":{"helm":{"valuesObject":{"databases":{"mongodb":false}}}}}}' --type=merge -n default
