@@ -30,7 +30,7 @@ spec:
         maxDuration: 3m # the maximum amount of time allowed for the backoff strategy
   source:
     repoURL: oci://registry-1.docker.io/bitnamicharts/mysql
-    targetRevision:
+    targetRevision: 9.10.9
     chart: mysql
     helm:
       valuesObject:
