@@ -43,7 +43,7 @@ spec:
           limits:
             memory: 2Gi
         auth:
-          trueexistingSecret: mysql-auth
+          existingSecret: mysql-auth
         persistence:
           size: 5Gi
 {{- end -}}
