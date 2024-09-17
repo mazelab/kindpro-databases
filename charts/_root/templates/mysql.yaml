@@ -29,7 +29,7 @@ spec:
         factor: 2 # a factor to multiply the base duration after each failed retry
         maxDuration: 3m # the maximum amount of time allowed for the backoff strategy
   source:
-    repoURL: oci://registry-1.docker.io/bitnamicharts
+    repoURL: registry-1.docker.io/bitnamicharts
     targetRevision: 9.10.9
     chart: mysql
     helm:
