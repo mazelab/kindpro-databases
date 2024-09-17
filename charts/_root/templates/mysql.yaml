@@ -1,8 +1,8 @@
-{{- if .Values.databases.mongodb -}}
+{{- if .Values.databases.mysql -}}
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: databases-mongodb
+  name: databases-mysql
   namespace: dafault
   labels:
     kindpro.mazelab.github.io/repo: "kindpro-databases"
@@ -29,12 +29,12 @@ spec:
         factor: 2 # a factor to multiply the base duration after each failed retry
         maxDuration: 3m # the maximum amount of time allowed for the backoff strategy
   source:
-    repoURL: https://charts.bitnami.com/bitnami
-    targetRevision: 13.12.0
-    chart: mongodb
+    repoURL: oci://registry-1.docker.io/bitnamicharts/mysql
+    targetRevision:
+    chart: mysql
     helm:
       valuesObject:
-        fullnameOverride: mongodb
+        fullnameOverride: mysql
         arbiter:
           enabled: false
         architecture: standalone
@@ -43,9 +43,7 @@ spec:
           limits:
             memory: 2Gi
         auth:
-          trueexistingSecret: {{ $.Values.auth.existingSecret }}
+          trueexistingSecret: mysql-auth
         persistence:
           size: 5Gi
-        rbac:
-          create: true
 {{- end -}}

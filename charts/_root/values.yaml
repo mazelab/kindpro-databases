@@ -6,4 +6,8 @@ databases:
 mongodb:
   auth:
     enabled: true
-    trueexistingSecret: ""
+    existingSecret: ""
+
+mysql:
+  auth:
+    existingSecret: ""
